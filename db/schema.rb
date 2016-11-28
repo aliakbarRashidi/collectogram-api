@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 20161128011223) do
     t.string   "next_id"
     t.string   "unique_url"
     t.boolean  "is_public"
+    t.boolean  "is_empty"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

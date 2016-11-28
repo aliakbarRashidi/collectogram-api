@@ -9,7 +9,13 @@ class Collection < ApplicationRecord
     self.unique_url = SecureRandom.urlsafe_base64(24) if !self.unique_url
 
     match_object = get_tag_photos(self.tag, self.start_date, self.end_date, self.next_id)
+
+    puts 'MATCHOJB'
+    puts match_object
+
     match_list = match_object[:matches]
+
+
     self.next_id = match_object[:next_id] || nil
     self.is_empty = (match_list.size == 0)
     self.save

@@ -14,6 +14,8 @@ module InstagramUtil
 
       data = response['data']
       next_page_id = response['pagination']['next_max_id']
+
+      return {matches: [], next_id: nil} if (data.size == 0)
       break if less_than_date(data.last['caption']['created_time'], end_date)
 
       # Need to check comments as well
