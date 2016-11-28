@@ -8,6 +8,7 @@ class CreateCollections < ActiveRecord::Migration[5.0]
       t.string :next_id
       t.string :unique_url
       t.boolean :is_public
+      t.boolean :is_empty
 
       t.timestamps
     end

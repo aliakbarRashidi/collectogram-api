@@ -11,6 +11,7 @@ class Collection < ApplicationRecord
     match_object = get_tag_photos(self.tag, self.start_date, self.end_date, self.next_id)
     match_list = match_object[:matches]
     self.next_id = match_object[:next_id] || nil
+    self.is_empty = (match_list.size == 0)
     self.save
     # Create cards for each of the matches
     match_list.each do |item|
