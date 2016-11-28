@@ -1,0 +1,7 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: collectogram_dev
+  pool: 5
+  username: root
+  password:
