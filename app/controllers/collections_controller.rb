@@ -8,7 +8,7 @@ class CollectionsController < ApplicationController
 
   def index
     offset_amount = ((params[:page_number].to_i - 1) * 10)
-    collections = Collection.where(is_public: true).and(is_empty: false).order(:created_at).offset(offset_amount).limit(10).to_a
+    collections = Collection.where('is_public = true AND is_empty = false').order(:created_at).offset(offset_amount).limit(10).to_a
     render json: {collections: collections}
   end
 
