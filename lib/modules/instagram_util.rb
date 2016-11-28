@@ -52,7 +52,7 @@ module InstagramUtil
 
   def valid_comment_date(media_id, tag_name, start_date, end_date)
     uri = URI("https://api.instagram.com/v1/media/#{media_id}/comments")
-    comments = send_json_request(uri, params)['data']
+    comments = send_json_request(uri)['data']
     comments.any? do |comment|
       between_dates(comment['created_time'], start_date, end_date) && comment['text'].include?(tag_name)
     end
