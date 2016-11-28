@@ -5,7 +5,7 @@ module InstagramUtil
     response = get_tag_data(tag_name, params)
     match_list = []
     finished_matching = false;
-    max_reqs = 20;
+    max_reqs = 60;
     current_reqs = 0;
 
     # Find the first page that contains valid matches
