@@ -10,22 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161128011223) do
+ActiveRecord::Schema.define(version: 20161201001743) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "cards", force: :cascade do |t|
     t.integer  "collection_id"
-    t.text     "content_caption"
-    t.string   "content_url"
-    t.string   "content_link"
+    t.text     "caption"
+    t.string   "image"
+    t.string   "link"
     t.string   "user_handle"
     t.string   "user_icon"
     t.boolean  "is_video"
     t.datetime "tag_time"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
     t.index ["collection_id"], name: "index_cards_on_collection_id", using: :btree
   end
 
@@ -34,12 +34,11 @@ ActiveRecord::Schema.define(version: 20161128011223) do
     t.string   "tag"
     t.date     "start_date"
     t.date     "end_date"
-    t.string   "next_id"
     t.string   "unique_url"
     t.boolean  "is_public"
-    t.boolean  "is_empty"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.string   "next_max_id"
   end
 
   add_foreign_key "cards", "collections"

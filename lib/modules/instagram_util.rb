@@ -1,89 +1,152 @@
 module InstagramUtil
-  def get_tag_photos(tag_name, start_date, end_date, next_id=nil)
-    params = {}
-    params = {max_tag_id: next_id} if next_id
-    response = get_tag_data(tag_name, params)
-    match_list = []
-    finished_matching = false;
-    max_reqs = 60;
-    current_reqs = 0;
+  def self.retrieve_tag_photos(tag, start_date, end_date, next_max_id=nil)
+    return empty_data_struct if invalid_id(next_max_id)
+    
+    tag_iterator = TagIterator.new(tag, start_date, end_date, next_max_id)
+    tag_iterator.process_tags
+    tag_iterator.data_struct
+ end
 
-    # Find the first page that contains valid matches
-    while (current_reqs < max_reqs)
-      current_reqs += 1;
+ def self.invalid_id(id)
+   id && id.length == 0
+ end
 
-      data = response['data']
-      next_page_id = response['pagination']['next_max_id']
+ def self.empty_data_struct
+   { next_max_id: '', items: [], info_code: 1000 }
+ end
 
-      return {matches: [], next_id: nil} if (data.size == 0)
-      break if less_than_date(data.last['caption']['created_time'], end_date)
+  class TagIterator
+    @@MAX_REQUESTS = 25
+    @@MIN_ITEMS = 20
+    @@INFO_CODES = {
+      SUCCESS: 1000,
+      NO_MATCHES: 1001,
+      INVALID: 1002
+    }
 
-      # Need to check comments as well
-      if less_than_date(data.first['caption']['created_time'], start_date)
-        if !valid_comment_date(data.first['id'], tag, start_date, end_date)
-          return {matches: [], next_id: nil}
+    def initialize(tag, start_date, end_date, next_max_id=nil)
+      @start_date, @end_date = start_date.to_time.to_i, end_date.to_time.to_i
+      @tag, @next_max_id = tag, next_max_id
+      @request_count = 0
+      @index = -1
+      @item_set = []
+      @valid_items = []
+      @info_code = @@INFO_CODES[:NO_MATCHES]
+
+      # Only happens the very first time
+      if !(next_max_id)
+        update_tag_set(require_next_id=false)
+        find_first_tag
+        @index -= 1
+      end
+    end
+
+    def data_struct
+      {
+        next_max_id: @next_max_id,
+        items: @valid_items,
+        info_code: @info_code
+      }
+    end
+
+    def process_tags
+      while(item = next_item)
+        break if past_start_date(item)
+        @valid_items.push(item)
+        break if collected_min_items
+      end
+
+      @info_code = @@INFO_CODES[:SUCCESS] if @valid_items.length > 0
+      return true
+    end
+
+    private
+      def find_first_tag
+        while(item = next_item)
+          return true if past_end_date(item)
+          break if past_start_date(item)
+        end
+        return false
+      end
+
+      def next_item
+        @index += 1
+        @item_set[@index] || update_tag_set
+      end
+
+      def past_end_date(item)
+        compare_date_and_time(@end_date, item, check_comments=false)
+      end
+
+      def past_start_date(item)
+        compare_date_and_time(@start_date, item, check_comments=true)
+      end
+
+      def compare_date_and_time(date, item, check_comments)
+        if item['caption']
+          item_time = item['caption']['created_time'].to_i
+          val = (item_time < date)
+        end
+
+        val = valid_comment_time(item['id']) if check_comments && val
+        val
+      end
+
+      def valid_comment_time(media_id)
+        comments = retrieve_comment_data(media_id)['data']
+        comments.any? do |comment|
+          time = comment['created_time'].to_i
+          time > @start_time && time < @end_time && comment['text'].include?(@tag)
         end
       end
-      response = get_tag_data(tag_name, {max_tag_id: next_page_id})
-    end
 
-    # Iterate through all pages until we run out of matches
-    while (current_reqs < max_reqs)
-      current_reqs += 1;
+      def update_tag_set(require_next_id=true)
+        return false if (@next_max_id == '') && require_next_id
+        res = retrieve_tag_data
 
-      data = response['data']
-      next_page_id = response['pagination']['next_max_id']
-      return {matches: match_list, next_id: next_page_id} if match_list.size > 20
-
-      accumulator = []
-      data.each do |item|
-        if (between_dates(item['created_time'], start_date, end_date) || valid_comment_date(item['id'], tag, start_date, end_date))
-            accumulator.push(item)
-        else
-          finished_matching = true
-          break
+        if hit_max_requests
+          @info_code = @@INFO_CODES[:INVALID]
+          return false
         end
+
+        @next_max_id = res['pagination']['next_max_id'] || ''
+        @item_set += res['data']
+        @item_set[@index]
       end
-      match_list += accumulator
 
-      return {matches: match_list, next_id: nil} if finished_matching
-      response = get_tag_data(tag_name, {max_tag_id: next_page_id})
-    end
-    return {matches: match_list, next_id: nil}
-  end
+      def hit_max_requests
+        @request_count += 1
+        @request_count >= @@MAX_REQUESTS
+      end
 
-  def valid_comment_date(media_id, tag_name, start_date, end_date)
-    uri = URI("https://api.instagram.com/v1/media/#{media_id}/comments")
-    comments = send_json_request(uri)['data']
-    comments.any? do |comment|
-      between_dates(comment['created_time'], start_date, end_date) && comment['text'].include?(tag_name)
-    end
-  end
+      def collected_min_items
+        @valid_items.size >= @@MIN_ITEMS
+      end
 
-  def get_tag_data(tag_name, params={})
-    uri = URI("https://api.instagram.com/v1/tags/#{tag_name}/media/recent")
-    send_json_request(uri, params)
-  end
+      def retrieve_tag_data
+        puts '----------- GETTING TAG DATA -------------'
+        uri = URI("https://api.instagram.com/v1/tags/#{@tag}/media/recent")
+        send_json_request(uri, current_params)
+      end
 
-  def send_json_request(uri, params={})
-    params[:access_token] = ENV['INSTAGRAM_API_KEY']
-    uri.query = URI.encode_www_form(params)
-    res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-      http.request(Net::HTTP::Get.new(uri))
-    end
+      def retrieve_comment_data(media_id)
+        puts '----------- GETTING COMMENT DATA -------------'
+        uri = URI("https://api.instagram.com/v1/media/#{media_id}/comments")
+        send_json_request(uri, current_params)
+      end
 
-    JSON.parse(res.body)
-  end
+      def current_params
+        params = { access_token: ENV['INSTAGRAM_API_KEY'] }
+        params[:max_tag_id] =  @next_max_id
+        params
+      end
 
-  def less_than_date(d1, d2)
-    d1.to_i < d2.to_time.to_i
-  end
-
-  def greater_than_date(d1, d2)
-    d1.to_i > d2.to_time.to_i
-  end
-
-  def between_dates(d1, d2, d3)
-    greater_than_date(d1, d2) and less_than_date(d1, d3)
+      def send_json_request(uri, params={})
+        uri.query = URI.encode_www_form(params)
+        res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          http.request(Net::HTTP::Get.new(uri))
+        end
+        JSON.parse(res.body)
+      end
   end
 end

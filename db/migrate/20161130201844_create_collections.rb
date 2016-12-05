@@ -5,10 +5,8 @@ class CreateCollections < ActiveRecord::Migration[5.0]
       t.string :tag
       t.date :start_date
       t.date :end_date
-      t.string :next_id
-      t.string :unique_url
+      t.string :unique_url, unique: true
       t.boolean :is_public
-      t.boolean :is_empty
 
       t.timestamps
     end
