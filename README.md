@@ -90,6 +90,30 @@ I chose to add some error response codes when the API is unable to complete cert
 
 I chose to build out a test suite with Webmock, which allowed me to test against a fake Instagram server. This was extremely helpful when initially working on the Instagram module.
 
+## Some Interesting Files to Look At
+
+Backend:
+
+- [Collections Controller](https://github.com/MacroMackie/collectogram-api/blob/master/app/controllers/collections_controller.rb)
+- [Collections Model](https://github.com/MacroMackie/collectogram-api/blob/master/app/models/collection.rb)
+- [Instagram Module](https://github.com/MacroMackie/collectogram-api/blob/master/lib/modules/instagram_util.rb)
+- [Controller Spec](https://github.com/MacroMackie/collectogram-api/blob/master/spec/controllers/collections_controller_spec.rb)
+- [Collection Spec](https://github.com/MacroMackie/collectogram-api/blob/master/spec/models/collection_spec.rb)
+
+Frontend:
+
+- [Home Page](https://github.com/MacroMackie/collectogram-web/blob/master/src/views/home/Home.js)
+- [Create Page](https://github.com/MacroMackie/collectogram-web/blob/master/src/views/create/Create.js)
+- [View Page](https://github.com/MacroMackie/collectogram-web/tree/master/src/views/view)
+- [List Page](https://github.com/MacroMackie/collectogram-web/blob/master/src/views/list/List.js)
+- [Validatior](https://github.com/MacroMackie/collectogram-web/blob/master/src/util/Validate.js)
+
+You can also take a look at some more in-depth information:
+
+- [Design](http://localhost/mackie/website/posts/collectogram_part_1_-_design.html)
+- [Backend](http://localhost/mackie/website/posts/collectogram_part_2_-_backend.html)
+- [Frontend](http://localhost/mackie/website/posts/collectogram_part_3_-_frontend.html)
+
 ## Some Improvements I Would Like To Make
 
 There are a few improvements that I would like to make to the application.
