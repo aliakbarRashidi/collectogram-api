@@ -81,5 +81,3 @@ test:
 production:
   <<: *default
   database: collectogram-api_production
-  username: collectogram-api
-  password: <%= ENV['COLLECTOGRAM-API_DATABASE_PASSWORD'] %>
