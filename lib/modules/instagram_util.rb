@@ -1,7 +1,7 @@
 module InstagramUtil
   def self.retrieve_tag_photos(tag, start_date, end_date, next_max_id=nil)
     return empty_data_struct if invalid_id(next_max_id)
-    
+
     tag_iterator = TagIterator.new(tag, start_date, end_date, next_max_id)
     tag_iterator.process_tags
     tag_iterator.data_struct
@@ -88,7 +88,7 @@ module InstagramUtil
           val = (item_time < date)
         end
 
-        val = valid_comment_time(item['id']) if check_comments && val
+        val = !valid_comment_time(item['id']) if check_comments && val
         val
       end
 
@@ -124,13 +124,11 @@ module InstagramUtil
       end
 
       def retrieve_tag_data
-        puts '----------- GETTING TAG DATA -------------'
         uri = URI("https://api.instagram.com/v1/tags/#{@tag}/media/recent")
         send_json_request(uri, current_params)
       end
 
       def retrieve_comment_data(media_id)
-        puts '----------- GETTING COMMENT DATA -------------'
         uri = URI("https://api.instagram.com/v1/media/#{media_id}/comments")
         send_json_request(uri, current_params)
       end

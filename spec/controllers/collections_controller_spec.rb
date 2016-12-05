@@ -1,24 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe CollectionsController, type: :controller do
+  before(:each) do
+    allow_any_instance_of(Collection).to receive(:get_photos).and_return(true)
+    allow_any_instance_of(Collection).to receive(:result_set).and_return({info_code: 1000, items: []})
+  end
+
   describe "POST #create" do
     it "should create a new collection when given all required fields" do
       collection = build(:collection)
-      allow_any_instance_of(Collection).to receive(:get_photos).and_return(true)
       post 'create', params: { collection: collection.attributes }
 
       expect(response).to be_success
       expect(Collection.count).to eq(1)
       expect(json['unique_url']).not_to be_nil
-    end
-
-    it "should not create a new collection when not given all required fields" do
-      collection = build(:collection)
-      allow_any_instance_of(Collection).to receive(:get_photos).and_return(true)
-      post 'create', params: { collection: collection.attributes }
-
-      expect(response).to be_success
-      expect(Collection.count).to eq(0)
     end
   end
 
@@ -37,14 +32,6 @@ RSpec.describe CollectionsController, type: :controller do
       expect(response).to be_success
       expect(json['collection']['id']).to eq(collection.id)
       expect(json['cards'].length).to eq(page_limit)
-    end
-
-    it "should not return any data if there is no corresponding collection" do
-      collection = create(:collection)
-      get 'show', params: { unique_url: collection.unique_url }
-
-      expect(response).to be_success
-      expect(json.length).to eq(0)
     end
   end
 
