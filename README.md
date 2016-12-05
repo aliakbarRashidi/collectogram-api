@@ -1,7 +1,7 @@
 # Collectogram Backend
 
 This is the backend for the Collectogram application.
-You can view the frontend by clicking [here](https://github.com/MacroMackie/collectogram-web). 
+You can view the frontend by clicking [here](https://github.com/MacroMackie/collectogram-web).
 <br>
 ## Online Demo
 You can view an online demo by clicking [here](http://collectogram-web.s3-website-us-west-2.amazonaws.com/#/home).
@@ -32,7 +32,7 @@ Now, follow the setups steps on on the [Frontend GitHub Page](https://github.com
 # Collectogram
 ## Project Overview
 
-The goal of Collectogram was to build a web application that takes a hashtag, start date, and end date, and collects any matching submissions from Instragram, arranging them into a "Collection". You can view the full project guidelines here: [Project Overview](http://localhost/mackie/website/assets/posts/files/collectogram-project-guidelines.pdf)
+The goal of Collectogram was to build a web application that takes a hashtag, start date, and end date, and collects any matching submissions from Instagram, arranging them into a "Collection". You can view the full project guidelines here: [Project Overview](http://localhost/mackie/website/assets/posts/files/collectogram-project-guidelines.pdf)
 
 A quick summary of the objectives:
 
@@ -59,7 +59,7 @@ The Backend:
     - Collections have a Name, Tag, StartDate, EndDate, and Visibility (Public vs. Private)
     - Cards belong to collections, and have all of the Image/User Data
 - Has a single Collections controller with create, show, index
-    - Create: creates a new collection and gets the first page of matching photos from instagram
+    - Create: creates a new collection and gets the first page of matching photos from Instagram
     - Show: returns a collection's data along with the card data
     - Index: returns a list of all public collections
 - Uses RSpec, FactoryGirl, WebMock, and Faker for testing
@@ -84,9 +84,9 @@ I chose to add a "Collection List" page which would show a list of all public co
 
 I chose to avoid using a 'user' model, and instead gave each collection a unique_url. This avoided a lot of work developing login/signup pages, and made the application more approachable. As well, it allows anyone to easily share public collections by sharing the url ([Example](http://collectogram-web.s3-website-us-west-2.amazonaws.com/#/collections/VDRhi-fQ-zdSk3va74XNePcP1WI3qHRn)). I decided to use a unique_url (rather than just share the id) to give some privacy to users who wish to make their collections "private".
 
-I chose to pull all of the Instagram-related logic into a seperate module. This makes the Collection model's methods seem almost a little too "magical", but it also greatly improved the readibility of the file.
+I chose to pull all of the Instagram-related logic into a separate module. This makes the Collection model's methods seem almost a little too "magical", but it also greatly improved the readability of the file.
 
-I chose to add some error response codes when the API is unable to complete certain operations. In the case where the user selects a tag and time period, but there are no images matching those criteria, the API returns {error: 1001} (Rather than creating an empty collection.) There is another, more frustrating case to consider. Instagram's API does not allow you to request specific time periods, and always returns data as a form of "linked lists of pages", starting with the most recent page of images. This is fine when you are searching for recent images, but in the case where you want to find #nofilter images from 6 months ago, I would have to paginate through the Instagram API endpoint thousands of times. Because of instagram's API limiting, I can only make a certain amount of requests each hour. In order to reduce the chance of hitting that cap, I limit the image-gather function to make only 25 requests at one time. In the case where a user wants to create a collection that is far back in time, but hits the rate limit, I respond with {error: 1002}. Specifying these error codes allows my to present the user with much more helpful information on the frontend.
+I chose to add some error response codes when the API is unable to complete certain operations. In the case where the user selects a tag and time period, but there are no images matching those criteria, the API returns {error: 1001} (Rather than creating an empty collection.) There is another, more frustrating case to consider. Instagram's API does not allow you to request specific time periods, and always returns data as a form of "linked lists of pages", starting with the most recent page of images. This is fine when you are searching for recent images, but in the case where you want to find #nofilter images from 6 months ago, I would have to paginate through the Instagram API endpoint thousands of times. Because of Instagram's API limiting, I can only make a certain amount of requests each hour. In order to reduce the chance of hitting that cap, I limit the image-gather function to make only 25 requests at one time. In the case where a user wants to create a collection that is far back in time, but hits the rate limit, I respond with {error: 1002}. Specifying these error codes allows my to present the user with much more helpful information on the frontend.
 
 I chose to build out a test suite with Webmock, which allowed me to test against a fake Instagram server. This was extremely helpful when initially working on the Instagram module.
 
@@ -124,9 +124,9 @@ The second is on the Backend. Right now, the pagination process relies on Limit+
 
 The third is that I would like to improve the way we get tagged images from the Instagram API. Some context for the issue; The image-gather function has two phases. In the first phase, it finds the first image in the set of matching images. In the second phase, it iterates over matching images, until it passes the end date. Right now, there is an error when encountering a specific corner case with comments. The error happens because my image-gather function looks exclusively at the "captioned-time" when it is looking for the very first matching image. In the case that the very first matching tagged image is tagged in a comment, the function will skip over it by accident. (Note that once the first image is found, the function starts considering comments as well - it is only in the first case that we have an issue). The reason that I decided to make it skip over looking at comments before the first match is that, in the case where there are hundreds of images before the first match, I might have to unnecessarily search through 1000s of comments looking for the first matching one. If I had more time, I would add some "look-back" functionality, which would backtrack from the first matching image and see if there were any prior images where the comment times matched.
 
-Lastly, I would like to improve the API by adding some asynchronous API calls. Right now, the app "gets more data when it needs it". If the users requests page 4 of a collection's cards, but those cards are not stored in the database, then the app fetches the next page (which slows down the user while they wait for Instagram's API to responsd). It would be great if we could always prepeare data for one or two pages in advance, as it would make the frontend experience feel a lot more fluid.
+Lastly, I would like to improve the API by adding some asynchronous API calls. Right now, the app "gets more data when it needs it". If the users requests page 4 of a collection's cards, but those cards are not stored in the database, then the app fetches the next page (which slows down the user while they wait for Instagram's API to respond). It would be great if we could always prepare data for one or two pages in advance, as it would make the frontend experience feel a lot more fluid.
 
-If I had even more time, I would focus on making the backend as stable as possible by improving the fault tolerence and security.
+If I had even more time, I would focus on making the backend as stable as possible by improving the fault tolerance and security.
 
 ## Conclusion
 
