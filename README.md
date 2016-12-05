@@ -110,9 +110,9 @@ Frontend:
 
 You can also take a look at some more in-depth information:
 
-- [Design](http://localhost/mackie/website/posts/collectogram_part_1_-_design.html)
-- [Backend](http://localhost/mackie/website/posts/collectogram_part_2_-_backend.html)
-- [Frontend](http://localhost/mackie/website/posts/collectogram_part_3_-_frontend.html)
+- [Design](https://mackie.io/posts/collectogram_part_1_-_design.html)
+- [Backend](https://mackie.io/posts/collectogram_part_2_-_backend.html)
+- [Frontend](https://mackie.io/posts/collectogram_part_3_-_frontend.html)
 
 ## Some Improvements I Would Like To Make
 
