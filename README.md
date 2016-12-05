@@ -104,7 +104,7 @@ Frontend:
 
 - [Home Page](https://github.com/MacroMackie/collectogram-web/blob/master/src/views/home/Home.js)
 - [Create Page](https://github.com/MacroMackie/collectogram-web/blob/master/src/views/create/Create.js)
-- [View Page](https://github.com/MacroMackie/collectogram-web/tree/master/src/views/view)
+- [View Page](https://github.com/MacroMackie/collectogram-web/blob/master/src/views/view/View.js)
 - [List Page](https://github.com/MacroMackie/collectogram-web/blob/master/src/views/list/List.js)
 - [Validatior](https://github.com/MacroMackie/collectogram-web/blob/master/src/util/Validate.js)
 
