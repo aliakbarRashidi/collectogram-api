@@ -6,6 +6,10 @@ You can view the frontend by clicking [here](https://github.com/MacroMackie/coll
 ## Online Demo
 You can view an online demo by clicking [here](http://collectogram-web.s3-website-us-west-2.amazonaws.com/#/home).
 <br>
+## Project Walkthrough
+You can view a "Development Walkthrough" of the project by clicking [here](https://mackie.io/posts/collectogram_part_1_-_design.html).
+
+<br>
 ## Running the Application Locally
 First, clone the repo.
 ```bash
